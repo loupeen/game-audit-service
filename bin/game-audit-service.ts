@@ -48,8 +48,8 @@ try {
   console.log(`   Log Retention: ${envConfig.logRetentionDays} days`);
   console.log(`   Cost Budget: $${envConfig.costBudget.monthly}/month`);
 
-  // Validate account if provided
-  if (account && account !== envConfig.awsAccountId) {
+  // Validate account if provided (skip in CI for synth validation)
+  if (account && account !== envConfig.awsAccountId && !process.env.CI) {
     throw new Error(
       `❌ Account mismatch! Current account: ${account}, Expected for ${environment}: ${envConfig.awsAccountId}`
     );

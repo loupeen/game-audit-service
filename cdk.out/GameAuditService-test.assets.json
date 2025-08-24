@@ -1,0 +1,81 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "8c1db2e5b37f0acff3872bc1d1a683817637536f13df1548599dfa61b7edac4b": {
+      "displayName": "EventIngestionFunction/Code",
+      "source": {
+        "path": "asset.8c1db2e5b37f0acff3872bc1d1a683817637536f13df1548599dfa61b7edac4b",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "728427470046-eu-north-1-fc21b311": {
+          "bucketName": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+          "objectKey": "8c1db2e5b37f0acff3872bc1d1a683817637536f13df1548599dfa61b7edac4b.zip",
+          "region": "eu-north-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-file-publishing-role-728427470046-eu-north-1"
+        }
+      }
+    },
+    "2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d": {
+      "displayName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Code",
+      "source": {
+        "path": "asset.2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "728427470046-eu-north-1-cb78bc51": {
+          "bucketName": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+          "objectKey": "2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d.zip",
+          "region": "eu-north-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-file-publishing-role-728427470046-eu-north-1"
+        }
+      }
+    },
+    "3472665750cd9dfa7ac659a8dcab1c830e350cc0bf21fef21f4912ddf40c1a92": {
+      "displayName": "QueryFunction/Code",
+      "source": {
+        "path": "asset.3472665750cd9dfa7ac659a8dcab1c830e350cc0bf21fef21f4912ddf40c1a92",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "728427470046-eu-north-1-2ba9f077": {
+          "bucketName": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+          "objectKey": "3472665750cd9dfa7ac659a8dcab1c830e350cc0bf21fef21f4912ddf40c1a92.zip",
+          "region": "eu-north-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-file-publishing-role-728427470046-eu-north-1"
+        }
+      }
+    },
+    "167b39d1be47fbf31c627f833a9ec9173eba530f461f363b33197ea7039dcf72": {
+      "displayName": "AnomalyDetectionFunction/Code",
+      "source": {
+        "path": "asset.167b39d1be47fbf31c627f833a9ec9173eba530f461f363b33197ea7039dcf72",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "728427470046-eu-north-1-4f5db8cd": {
+          "bucketName": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+          "objectKey": "167b39d1be47fbf31c627f833a9ec9173eba530f461f363b33197ea7039dcf72.zip",
+          "region": "eu-north-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-file-publishing-role-728427470046-eu-north-1"
+        }
+      }
+    },
+    "3cffb9d64d4fe4a7e8fab3676e9c108120c9672cf56bf8f09db1a248a4023bcb": {
+      "displayName": "GameAuditService-test Template",
+      "source": {
+        "path": "GameAuditService-test.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "728427470046-eu-north-1-d0507175": {
+          "bucketName": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+          "objectKey": "3cffb9d64d4fe4a7e8fab3676e9c108120c9672cf56bf8f09db1a248a4023bcb.json",
+          "region": "eu-north-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-file-publishing-role-728427470046-eu-north-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

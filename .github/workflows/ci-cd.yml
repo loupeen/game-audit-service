@@ -60,6 +60,8 @@ jobs:
 
     - name: CDK Synth (validation)
       run: npm run synth
+      env:
+        CI: true
 
     - name: Upload coverage to Codecov
       if: success()

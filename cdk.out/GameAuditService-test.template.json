@@ -1,0 +1,1051 @@
+{
+ "Description": "Game Audit Service for Loupeen RTS Platform (test)",
+ "Resources": {
+  "AuditEventsTable0723963E": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "eventId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "timestamp",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "serviceName",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "eventType",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "principalId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "riskLevel",
+      "AttributeType": "S"
+     }
+    ],
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "ServiceEventTypeIndex",
+      "KeySchema": [
+       {
+        "AttributeName": "serviceName",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "eventType",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+       "ReadCapacityUnits": 5,
+       "WriteCapacityUnits": 5
+      }
+     },
+     {
+      "IndexName": "PrincipalTimeIndex",
+      "KeySchema": [
+       {
+        "AttributeName": "principalId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+       "ReadCapacityUnits": 5,
+       "WriteCapacityUnits": 5
+      }
+     },
+     {
+      "IndexName": "RiskLevelTimeIndex",
+      "KeySchema": [
+       {
+        "AttributeName": "riskLevel",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+       "ReadCapacityUnits": 5,
+       "WriteCapacityUnits": 5
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "eventId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "timestamp",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": false
+    },
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    },
+    "SSESpecification": {
+     "SSEEnabled": true
+    },
+    "TableName": "loupeen-audit-events-test"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AuditEventsTable/Resource"
+   }
+  },
+  "EventIngestionFunctionServiceRole63D06A8E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/EventIngestionFunction/ServiceRole/Resource"
+   }
+  },
+  "EventIngestionFunctionServiceRoleDefaultPolicy447A299B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchWriteItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "AuditEventsTable0723963E",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AuditEventsTable0723963E",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "EventIngestionFunctionServiceRoleDefaultPolicy447A299B",
+    "Roles": [
+     {
+      "Ref": "EventIngestionFunctionServiceRole63D06A8E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/EventIngestionFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "EventIngestionFunction72EAC0E5": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+     "S3Key": "8c1db2e5b37f0acff3872bc1d1a683817637536f13df1548599dfa61b7edac4b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AUDIT_TABLE_NAME": {
+       "Ref": "AuditEventsTable0723963E"
+      },
+      "ENVIRONMENT": "test",
+      "LOG_LEVEL": "DEBUG"
+     }
+    },
+    "FunctionName": "game-audit-ingestion-test",
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "EventIngestionFunctionServiceRole63D06A8E",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 120,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "EventIngestionFunctionServiceRoleDefaultPolicy447A299B",
+    "EventIngestionFunctionServiceRole63D06A8E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/EventIngestionFunction/Resource",
+    "aws:asset:path": "asset.8c1db2e5b37f0acff3872bc1d1a683817637536f13df1548599dfa61b7edac4b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "EventIngestionFunctionLogRetention4745D7EC": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "EventIngestionFunction72EAC0E5"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 90
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/EventIngestionFunction/LogRetention/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:DeleteRetentionPolicy",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "Roles": [
+     {
+      "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Handler": "index.handler",
+    "Runtime": "nodejs22.x",
+    "Timeout": 900,
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+     "S3Key": "2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+    "aws:asset:path": "asset.2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "QueryFunctionServiceRoleF5EB059D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/QueryFunction/ServiceRole/Resource"
+   }
+  },
+  "QueryFunctionServiceRoleDefaultPolicyF63D0CC9": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "AuditEventsTable0723963E",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AuditEventsTable0723963E",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "QueryFunctionServiceRoleDefaultPolicyF63D0CC9",
+    "Roles": [
+     {
+      "Ref": "QueryFunctionServiceRoleF5EB059D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/QueryFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "QueryFunctionBDF4DE5B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+     "S3Key": "3472665750cd9dfa7ac659a8dcab1c830e350cc0bf21fef21f4912ddf40c1a92.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AUDIT_TABLE_NAME": {
+       "Ref": "AuditEventsTable0723963E"
+      },
+      "ENVIRONMENT": "test",
+      "LOG_LEVEL": "DEBUG"
+     }
+    },
+    "FunctionName": "game-audit-query-test",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "QueryFunctionServiceRoleF5EB059D",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "QueryFunctionServiceRoleDefaultPolicyF63D0CC9",
+    "QueryFunctionServiceRoleF5EB059D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/QueryFunction/Resource",
+    "aws:asset:path": "asset.3472665750cd9dfa7ac659a8dcab1c830e350cc0bf21fef21f4912ddf40c1a92",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "QueryFunctionLogRetention61CDE44D": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "QueryFunctionBDF4DE5B"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 90
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/QueryFunction/LogRetention/Resource"
+   }
+  },
+  "AuthEventsRule5163DC58": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Capture authentication and authorization events for audit trail",
+    "EventPattern": {
+     "source": [
+      "loupeen.auth",
+      "loupeen.authz"
+     ],
+     "detail-type": [
+      "Authentication Event",
+      "Authorization Event",
+      "Token Event",
+      "Permission Change"
+     ]
+    },
+    "Name": "loupeen-auth-events-test",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "EventIngestionFunction72EAC0E5",
+        "Arn"
+       ]
+      },
+      "Id": "Target0",
+      "RetryPolicy": {
+       "MaximumRetryAttempts": 3
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AuthEventsRule/Resource"
+   }
+  },
+  "AuthEventsRuleAllowEventRuleGameAuditServicetestEventIngestionFunction0F7EA4508DC970E7": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "EventIngestionFunction72EAC0E5",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "AuthEventsRule5163DC58",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AuthEventsRule/AllowEventRuleGameAuditServicetestEventIngestionFunction0F7EA450"
+   }
+  },
+  "HighRiskEventsRule13D2AAAF": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Capture high-risk security events for immediate audit attention",
+    "EventPattern": {
+     "source": [
+      "loupeen.security"
+     ],
+     "detail": {
+      "riskLevel": [
+       "CRITICAL",
+       "HIGH"
+      ]
+     }
+    },
+    "Name": "loupeen-high-risk-events-test",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "EventIngestionFunction72EAC0E5",
+        "Arn"
+       ]
+      },
+      "Id": "Target0",
+      "RetryPolicy": {
+       "MaximumRetryAttempts": 5
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/HighRiskEventsRule/Resource"
+   }
+  },
+  "HighRiskEventsRuleAllowEventRuleGameAuditServicetestEventIngestionFunction0F7EA450B3E10A86": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "EventIngestionFunction72EAC0E5",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "HighRiskEventsRule13D2AAAF",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/HighRiskEventsRule/AllowEventRuleGameAuditServicetestEventIngestionFunction0F7EA450"
+   }
+  },
+  "AuditPublisherRole9F4BA1E8": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "RoleName": "loupeen-audit-publisher-test"
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AuditPublisherRole/Resource"
+   }
+  },
+  "AuditPublisherRoleDefaultPolicy6297FCE5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": "arn:aws:events:eu-north-1:728427470046:event-bus/default"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AuditPublisherRoleDefaultPolicy6297FCE5",
+    "Roles": [
+     {
+      "Ref": "AuditPublisherRole9F4BA1E8"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AuditPublisherRole/DefaultPolicy/Resource"
+   }
+  },
+  "AnomalyDetectionFunctionServiceRole5FE62A73": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AnomalyDetectionFunction/ServiceRole/Resource"
+   }
+  },
+  "AnomalyDetectionFunctionServiceRoleDefaultPolicy7A77DD85": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "AuditEventsTable0723963E",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AuditEventsTable0723963E",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AnomalyDetectionFunctionServiceRoleDefaultPolicy7A77DD85",
+    "Roles": [
+     {
+      "Ref": "AnomalyDetectionFunctionServiceRole5FE62A73"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AnomalyDetectionFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AnomalyDetectionFunction8A8B313C": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-728427470046-eu-north-1",
+     "S3Key": "167b39d1be47fbf31c627f833a9ec9173eba530f461f363b33197ea7039dcf72.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AUDIT_TABLE_NAME": {
+       "Ref": "AuditEventsTable0723963E"
+      },
+      "ENVIRONMENT": "test",
+      "LOG_LEVEL": "DEBUG"
+     }
+    },
+    "FunctionName": "game-audit-anomaly-test",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "AnomalyDetectionFunctionServiceRole5FE62A73",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 300,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "AnomalyDetectionFunctionServiceRoleDefaultPolicy7A77DD85",
+    "AnomalyDetectionFunctionServiceRole5FE62A73"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AnomalyDetectionFunction/Resource",
+    "aws:asset:path": "asset.167b39d1be47fbf31c627f833a9ec9173eba530f461f363b33197ea7039dcf72",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AnomalyDetectionFunctionLogRetention82EB5D96": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "AnomalyDetectionFunction8A8B313C"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 90
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AnomalyDetectionFunction/LogRetention/Resource"
+   }
+  },
+  "AnomalyDetectionSchedule4C2FEAA2": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Schedule anomaly detection analysis",
+    "Name": "loupeen-anomaly-detection-test",
+    "ScheduleExpression": "rate(1 hour)",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "AnomalyDetectionFunction8A8B313C",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AnomalyDetectionSchedule/Resource"
+   }
+  },
+  "AnomalyDetectionScheduleAllowEventRuleGameAuditServicetestAnomalyDetectionFunctionFD0005167CFFE4CD": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AnomalyDetectionFunction8A8B313C",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "AnomalyDetectionSchedule4C2FEAA2",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AnomalyDetectionSchedule/AllowEventRuleGameAuditServicetestAnomalyDetectionFunctionFD000516"
+   }
+  },
+  "AuditDashboard09CCE1EA": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"widgets\":[{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Event Ingestion Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "EventIngestionFunction72EAC0E5"
+       },
+       "\",{\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "EventIngestionFunction72EAC0E5"
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":6,\"height\":6,\"x\":6,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Query Function Performance\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "QueryFunctionBDF4DE5B"
+       },
+       "\"],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "QueryFunctionBDF4DE5B"
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "loupeen-audit-service-test"
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/AuditDashboard/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02O0W7CMAxFv4X31IP2C4BpT5NAZe/ITUwJTZOpdqhQlH9HDdu0p3utY9/rGupNDesVzlxpM1TOdpBOgnpQOPM5mYfHMZgO0hd2jtT+4ovJyuHYGYT0Eb0WG/yC/vsjTaNltsFnZXGE1IbXfdFjcFY/yl5xWXFzRmYShu0iihvYRT2Q7JBJudAzfIa+JSFfKuhOXhhSG39i4/KVdiGaGUVfIb0jX7uAk1nw35CzaolDnDSp0nQS7K3vS8Yv2F/8Icp3lKx8MAQ3frvXNWwaWK9ubG01RS92JGhf+gRAmtOpRwEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "GameAuditService-test/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "AuditTableName": {
+   "Description": "DynamoDB table name for audit events",
+   "Value": {
+    "Ref": "AuditEventsTable0723963E"
+   }
+  },
+  "EventIngestionFunctionArn": {
+   "Description": "Lambda function ARN for event ingestion",
+   "Value": {
+    "Fn::GetAtt": [
+     "EventIngestionFunction72EAC0E5",
+     "Arn"
+    ]
+   }
+  },
+  "QueryFunctionArn": {
+   "Description": "Lambda function ARN for audit queries",
+   "Value": {
+    "Fn::GetAtt": [
+     "QueryFunctionBDF4DE5B",
+     "Arn"
+    ]
+   }
+  },
+  "AuditPublisherRoleArn": {
+   "Description": "IAM role ARN for cross-service audit event publishing",
+   "Value": {
+    "Fn::GetAtt": [
+     "AuditPublisherRole9F4BA1E8",
+     "Arn"
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
