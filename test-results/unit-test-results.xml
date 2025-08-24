@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="12" failures="0" errors="0" time="5.296">
+  <testsuite name="GameAuditServiceStack" errors="0" failures="0" skipped="0" timestamp="2025-08-24T11:16:19" time="5.172" tests="12">
+    <testcase classname="GameAuditServiceStack creates DynamoDB table with correct configuration" name="GameAuditServiceStack creates DynamoDB table with correct configuration" time="0.272">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates all required GSI indexes" name="GameAuditServiceStack creates all required GSI indexes" time="0.06">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates event ingestion Lambda function" name="GameAuditServiceStack creates event ingestion Lambda function" time="0.058">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates query Lambda function" name="GameAuditServiceStack creates query Lambda function" time="0.054">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates anomaly detection Lambda function" name="GameAuditServiceStack creates anomaly detection Lambda function" time="0.055">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates EventBridge rules for audit events" name="GameAuditServiceStack creates EventBridge rules for audit events" time="0.052">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates anomaly detection schedule" name="GameAuditServiceStack creates anomaly detection schedule" time="0.055">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates IAM role for audit publishers" name="GameAuditServiceStack creates IAM role for audit publishers" time="0.054">
+    </testcase>
+    <testcase classname="GameAuditServiceStack creates CloudWatch dashboard" name="GameAuditServiceStack creates CloudWatch dashboard" time="0.058">
+    </testcase>
+    <testcase classname="GameAuditServiceStack grants correct DynamoDB permissions" name="GameAuditServiceStack grants correct DynamoDB permissions" time="0.054">
+    </testcase>
+    <testcase classname="GameAuditServiceStack has correct stack outputs" name="GameAuditServiceStack has correct stack outputs" time="0.057">
+    </testcase>
+    <testcase classname="GameAuditServiceStack configures different settings for production environment" name="GameAuditServiceStack configures different settings for production environment" time="0.115">
+    </testcase>
+  </testsuite>
+</testsuites>

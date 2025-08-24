@@ -61,16 +61,16 @@
         }
       }
     },
-    "3cffb9d64d4fe4a7e8fab3676e9c108120c9672cf56bf8f09db1a248a4023bcb": {
+    "a92c37340c011a84fd90c22aae8c77e3a840a048f330c65b0c98f63239ed2f64": {
       "displayName": "GameAuditService-test Template",
       "source": {
         "path": "GameAuditService-test.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "728427470046-eu-north-1-d0507175": {
+        "728427470046-eu-north-1-b5e61805": {
           "bucketName": "cdk-hnb659fds-assets-728427470046-eu-north-1",
-          "objectKey": "3cffb9d64d4fe4a7e8fab3676e9c108120c9672cf56bf8f09db1a248a4023bcb.json",
+          "objectKey": "a92c37340c011a84fd90c22aae8c77e3a840a048f330c65b0c98f63239ed2f64.json",
           "region": "eu-north-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-file-publishing-role-728427470046-eu-north-1"
         }

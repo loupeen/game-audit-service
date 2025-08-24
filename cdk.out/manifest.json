@@ -15,20 +15,10 @@
       "properties": {
         "templateFile": "GameAuditService-test.template.json",
         "terminationProtection": false,
-        "tags": {
-          "CostCenter": "test",
-          "DataClassification": "confidential",
-          "Environment": "test",
-          "ManagedBy": "CDK",
-          "Platform": "loupeen-rts",
-          "Repository": "https://github.com/loupeen/game-audit-service",
-          "SecurityLevel": "high",
-          "Service": "game-audit-service"
-        },
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-deploy-role-728427470046-eu-north-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::728427470046:role/cdk-hnb659fds-cfn-exec-role-728427470046-eu-north-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-728427470046-eu-north-1/3cffb9d64d4fe4a7e8fab3676e9c108120c9672cf56bf8f09db1a248a4023bcb.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-728427470046-eu-north-1/a92c37340c011a84fd90c22aae8c77e3a840a048f330c65b0c98f63239ed2f64.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -44,45 +34,6 @@
         "GameAuditService-test.assets"
       ],
       "metadata": {
-        "/GameAuditService-test": [
-          {
-            "type": "aws:cdk:stack-tags",
-            "data": [
-              {
-                "Key": "CostCenter",
-                "Value": "test"
-              },
-              {
-                "Key": "DataClassification",
-                "Value": "confidential"
-              },
-              {
-                "Key": "Environment",
-                "Value": "test"
-              },
-              {
-                "Key": "ManagedBy",
-                "Value": "CDK"
-              },
-              {
-                "Key": "Platform",
-                "Value": "loupeen-rts"
-              },
-              {
-                "Key": "Repository",
-                "Value": "https://github.com/loupeen/game-audit-service"
-              },
-              {
-                "Key": "SecurityLevel",
-                "Value": "high"
-              },
-              {
-                "Key": "Service",
-                "Value": "game-audit-service"
-              }
-            ]
-          }
-        ],
         "/GameAuditService-test/AuditEventsTable": [
           {
             "type": "aws:cdk:hasPhysicalName",

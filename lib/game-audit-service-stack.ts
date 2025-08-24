@@ -9,9 +9,6 @@ import { Construct } from 'constructs';
 
 export interface GameAuditServiceStackProps extends cdk.StackProps {
   environment: string;
-  region: string;
-  accountId: string;
-  logRetentionDays: number;
 }
 
 export class GameAuditServiceStack extends cdk.Stack {
@@ -101,7 +98,7 @@ export class GameAuditServiceStack extends cdk.Stack {
         ENVIRONMENT: props.environment,
         LOG_LEVEL: props.environment === 'production' ? 'INFO' : 'DEBUG'
       },
-      logRetention: props.logRetentionDays as logs.RetentionDays,
+      logRetention: logs.RetentionDays.ONE_MONTH,
       tracing: lambda.Tracing.ACTIVE
     });
 
@@ -119,7 +116,7 @@ export class GameAuditServiceStack extends cdk.Stack {
         ENVIRONMENT: props.environment,
         LOG_LEVEL: props.environment === 'production' ? 'INFO' : 'DEBUG'
       },
-      logRetention: props.logRetentionDays as logs.RetentionDays,
+      logRetention: logs.RetentionDays.ONE_MONTH,
       tracing: lambda.Tracing.ACTIVE
     });
 
@@ -182,7 +179,7 @@ export class GameAuditServiceStack extends cdk.Stack {
         'events:PutEvents'
       ],
       resources: [
-        `arn:aws:events:${props.region}:${props.accountId}:event-bus/default`
+        `arn:aws:events:${this.region}:${this.account}:event-bus/default`
       ]
     }));
 
@@ -200,7 +197,7 @@ export class GameAuditServiceStack extends cdk.Stack {
         ENVIRONMENT: props.environment,
         LOG_LEVEL: props.environment === 'production' ? 'INFO' : 'DEBUG'
       },
-      logRetention: props.logRetentionDays as logs.RetentionDays,
+      logRetention: logs.RetentionDays.ONE_MONTH,
       tracing: lambda.Tracing.ACTIVE
     });
 

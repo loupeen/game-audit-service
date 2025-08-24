@@ -1,5 +1,5 @@
 {
- "Description": "Game Audit Service for Loupeen RTS Platform (test)",
+ "Description": "Audit service for Loupeen RTS Platform (test)",
  "Resources": {
   "AuditEventsTable0723963E": {
    "Type": "AWS::DynamoDB::Table",
@@ -278,7 +278,7 @@
       ]
      ]
     },
-    "RetentionInDays": 90
+    "RetentionInDays": 30
    },
    "Metadata": {
     "aws:cdk:path": "GameAuditService-test/EventIngestionFunction/LogRetention/Resource"
@@ -534,7 +534,7 @@
       ]
      ]
     },
-    "RetentionInDays": 90
+    "RetentionInDays": 30
    },
    "Metadata": {
     "aws:cdk:path": "GameAuditService-test/QueryFunction/LogRetention/Resource"
@@ -877,7 +877,7 @@
       ]
      ]
     },
-    "RetentionInDays": 90
+    "RetentionInDays": 30
    },
    "Metadata": {
     "aws:cdk:path": "GameAuditService-test/AnomalyDetectionFunction/LogRetention/Resource"

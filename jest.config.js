@@ -1,7 +1,15 @@
 module.exports = {
+  displayName: 'Unit Tests',
   testEnvironment: 'node',
   roots: ['<rootDir>/test'],
-  testMatch: ['**/*.test.ts'],
+  testMatch: [
+    '<rootDir>/test/unit/**/*.test.ts',
+    '<rootDir>/test/**/*.test.ts'
+  ],
+  testPathIgnorePatterns: [
+    '<rootDir>/test/integration/',
+    '<rootDir>/test/performance/'
+  ],
   transform: {
     '^.+\\.tsx?$': 'ts-jest'
   },
@@ -12,7 +20,8 @@ module.exports = {
     'lib/**/*.ts',
     'lambda/**/*.ts',
     '!lib/**/*.d.ts',
-    '!lib/**/*.js'
+    '!lib/**/*.js',
+    '!**/*.test.ts'
   ],
   coverageThreshold: {
     global: {
@@ -23,5 +32,17 @@ module.exports = {
     }
   },
   testTimeout: 30000,
-  setupFilesAfterEnv: ['<rootDir>/test/setup.ts']
+  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  reporters: [
+    'default',
+    ['jest-junit', {
+      outputDirectory: 'test-results',
+      outputName: 'unit-test-results.xml'
+    }],
+    ['jest-html-reporters', {
+      publicPath: './test-results',
+      filename: 'unit-test-report.html',
+      expand: true
+    }]
+  ]
 };
